@@ -21,7 +21,7 @@ with open(path) as f:
 
 client = OpenAI()
 def run_llm(puzzle):
-    prompt = "Solve this 4x4 sudoku by replacing 0s with numbers 1 to 4. Only print the solution, no other text." + "\n\n" + format_sudoku(puzzle) + "\n\n" + "The sudoku is:" + "\n\n" + format_sudoku(solution)
+    prompt = "Solve this 4x4 sudoku by replacing 0s with numbers 1 to 4. Only print the solution, no other text." + "\n\n" + "The sudoku is:" + "\n\n" + format_sudoku(solution)
     completion = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user",
