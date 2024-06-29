@@ -17,8 +17,20 @@ def parse_sudoku(text):
         
 
 client = OpenAI()
-def run_llm(puzzle):
-    prompt = "Solve this 9x9 sudoku by replacing 0s with numbers 1 to 9. Only print the solution, no other text." + "\n\n" + "The sudoku is:" + "\n\n" + format_sudoku(puzzle)
+def run_llm(puzzle, few_shot=0):
+    prompt = "Solve this 9x9 sudoku by replacing 0s with numbers 1 to 9."
+    prompt += "Only print the solution, no other text.\n\n"
+    for _ in range(few_shot):
+        p = sudokum.generate(mask_rate=0.1)
+        _, s = sudokum.solve(p)
+        p, s= np.array(p), np.array(s)
+        prompt += "Here is an example:\n"
+        prompt += format_sudoku(p)
+        prompt += "The solution is:\n"
+        prompt += format_sudoku(s)
+        prompt += "\n\n"
+
+    prompt += "The sudoku is:" + "\n\n" + format_sudoku(puzzle)
     completion = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user",
@@ -40,7 +52,7 @@ for line in iterator:
     _, solution = sudokum.solve(puzzle)
     puzzle, solution = np.array(puzzle), np.array(solution)
     
-    answer = run_llm(puzzle)
+    answer = run_llm(puzzle, few_shot=1)
     correct = np.all(answer == solution)
     cnt_correct += correct
     cnt += 1
